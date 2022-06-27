@@ -1,1 +1,515 @@
+CREATE DATABASE BookingTickets
+
+USE BookingTickets
+
+CREATE TABLE Country
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(40) NOT NULL,
+    UNIQUE (`Name`)
+)
+
+CREATE TABLE Production
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(40) NOT NULL,
+    City VARCHAR(100) NOT NULL,
+	Studio VARCHAR(100) NOT NULL,
+    UNIQUE (`Name`)
+)
+
+CREATE TABLE Genre
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(40) NOT NULL,
+    `Description` VARCHAR(1000) NULL,
+    UNIQUE (`Name`)
+)
+
+CREATE TABLE Hall
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(40) NOT NULL,
+    UNIQUE (`Name`)
+)
+
+
+CREATE TABLE Category
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(100) NOT NULL,
+    UNIQUE (`Name`)
+)
+
+CREATE TABLE Price
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	`Date` DATE NOT NULL,
+    `Time` TIME NOT NULL,
+    CategoryId INT NULL,
+    Cost DECIMAL(5,2) NOT NULL,
+    UNIQUE (`Date`, `Time`, CategoryId),
+    FOREIGN KEY (CategoryId) REFERENCES Category(Id) ON DELETE SET NULL ON UPDATE CASCADE
+)
+
+
+CREATE TABLE Film
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Name` VARCHAR(100) NOT NULL,
+    Duration INT NOT NULL,
+    YearOfIssue INT CHECK (YearOfIssue>=1895),
+    AgeConstraint VARCHAR(15) NULL,
+	ProductionId INT,
+    GenreId INT,
+    CountryId INT,
+	`Description` VARCHAR(1000) NOT NULL,
+    FOREIGN KEY (ProductionId) REFERENCES Production(Id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (CountryId) REFERENCES Country(Id) ON DELETE SET NULL ON UPDATE CASCADE,
+    FOREIGN KEY (GenreId) REFERENCES Genre(Id) ON DELETE SET NULL ON UPDATE CASCADE
+)
+
+CREATE TABLE Booking
+(
+	Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `Date` DATE NOT NULL,
+	`Time` TIME NOT NULL,
+    HallId INT,
+    `Row` INT NOT NULL,
+    Place INT NOT NULL,
+    FilmId INT,
+    PriceId INT, 
+	IsSold BOOLEAN NOT NULL DEFAULT FALSE,
+	FOREIGN KEY (HallId) REFERENCES Hall(Id) ON DELETE SET NULL ON UPDATE CASCADE,
+	FOREIGN KEY (FilmId) REFERENCES Film(Id) ON DELETE SET NULL ON UPDATE CASCADE,
+	FOREIGN KEY (PriceId) REFERENCES Price(Id) ON DELETE SET NULL ON UPDATE CASCADE
+) AUTO_INCREMENT = 1000;
+
+
+CREATE TABLE Ticket
+(
+	Id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	`Date` DATE NOT NULL,
+	`Time` TIME NOT NULL,
+    Customer VARCHAR(40) NOT NULL,
+    BookingId INT,
+	Benefits VARCHAR(10) NOT NULL DEFAULT 'Немає' CHECK (Benefits IN ('Немає', 'Школяр', 'Студент')),
+	EndPrice DECIMAL(5,2),
+	FOREIGN KEY (BookingId) REFERENCES Booking(Id) ON DELETE SET NULL ON UPDATE CASCADE
+)
+
+
+
+
+INSERT INTO Country
+(`Name`)
+VALUES
+('Україна'),
+('Німеччина'),
+('Франція'),
+('Швейцарія')
+
+
+INSERT INTO Production
+(`Name`, City, Studio)
+VALUE
+('Про TV', 'Лондон', 'Універсал фільм студіо'),
+('Columbia Pictures', 'Ванкувер', 'Симфонія'),
+('Двадцятий вік', 'Монреаль', 'Тир фільм'),
+('Парамаунт Пікчерз', 'Київ', 'Укртелефільм')
+
+
+INSERT INTO Genre
+(`Name`, `Description`)
+VALUES
+('Бойовик', 'Поєднує в собі драматичний жанр фільму разом з нестримними діями: бійки, автомобільні переслідування, вибухи'),
+('Детектив', 'Різновид творів масової культури, в яких розкривається певна таємниця, пов\'язана зі злочином'),
+('Історичний фільм', 'Різновид фільмів, в яких зображуються конкретні історичні епохи, події та постаті минулого'),
+('Вестерн', 'Жанр про освоєння та підкорення Дикого Заходу у XIX сторіччі'),
+('Драма', 'Літературний жанр, п\'єса соціального, історичного чи побутового характеру з гострим конфліктом')
+
+
+INSERT INTO Hall
+(`Name`)
+VALUES
+('Малий зал'),
+('Великий зал'),
+('VIP зал')
+
+
+INSERT INTO Category
+(`Name`)
+VALUES
+('Стандарт'),
+('Комфорт'),
+('Люкс')
+
+
+INSERT INTO Price
+(`Date`, `Time`, CategoryId, Cost)
+VALUES
+('2022-04-05', '10:00:00', 1, 150),
+('2022-04-05', '10:00:00', 2, 200),
+('2022-04-05', '10:00:00', 3, 250),
+('2022-04-05', '12:00:00', 1, 160),
+('2022-04-05', '12:00:00', 2, 210),
+('2022-04-05', '12:00:00', 3, 260),
+('2022-04-05', '14:00:00', 1, 180),
+('2022-04-05', '14:00:00', 2, 220),
+('2022-04-05', '14:00:00', 3, 270),
+('2022-04-05', '17:00:00', 1, 200),
+('2022-04-05', '17:00:00', 2, 300),
+('2022-04-05', '17:00:00', 3, 400),
+('2022-04-05', '18:00:00', 1, 200),
+('2022-04-05', '18:00:00', 2, 300),
+('2022-04-05', '18:00:00', 3, 400),
+('2022-04-05', '20:00:00', 1, 300),
+('2022-04-05', '20:00:00', 2, 400),
+('2022-04-05', '20:00:00', 3, 500),
+('2022-04-06', '10:00:00', 1, 160),
+('2022-04-06', '10:00:00', 2, 200),
+('2022-04-06', '10:00:00', 3, 210),
+('2022-04-06', '12:00:00', 1, 160),
+('2022-04-06', '12:00:00', 2, 210),
+('2022-04-06', '12:00:00', 3, 260),
+('2022-04-06', '14:00:00', 1, 180),
+('2022-04-06', '14:00:00', 2, 210),
+('2022-04-06', '14:00:00', 3, 270),
+('2022-04-06', '17:00:00', 1, 210),
+('2022-04-06', '17:00:00', 2, 300),
+('2022-04-06', '17:00:00', 3, 410),
+('2022-04-06', '18:00:00', 1, 200),
+('2022-04-06', '18:00:00', 2, 300),
+('2022-04-06', '18:00:00', 3, 410),
+('2022-04-06', '20:00:00', 1, 300),
+('2022-04-06', '20:00:00', 2, 410),
+('2022-04-06', '20:00:00', 3, 500)
+
+
+INSERT INTO Film
+(`Name`, Duration, YearOfIssue, AgeConstraint, ProductionId, GenreId, CountryId, `Description`)
+VALUES
+('Вовк і лев', 92, 2015, '0+', 1, 1,  1,'Молода дівчина на ім’я Алма (Моллі Кунц) приїжджає у гості до Джо (Грем Грін). Чоловік живе усамітнено у одному з наймальовничіших куточків Канади. Алма лишиться тут на деякий час.'),
+('Душа', 90, 2020, '2+', 1, 5, 3, 'шкільний учитель музики Джо Гарднер, який завжди мріяв грати джаз, і ось одного разу життя дарувало йому такий шанс. Зраділий Джо зовсім не дивиться під ноги, провалюється в люк й … опиняється в потойбічному світі.'),
+('Байкал', 120, 2021, '6+', 2, 1, 2, 'Фільм починається з того, що ми бачимо, як студент Валентин біжить на залікове заняття набережною Пітера, а в цей час його однокурсники розбирають теми'),
+('Лена та білий тигр', 102, 2021, '6+', 2, 1, 4, 'Двоє не найуспішніших контрабандистів намагаються передати білого тигреня в руки багатого колекціонера екзотичних звірів. Але все йде не за планом, і тварина збігає.')
+
+
+INSERT INTO Booking
+(`Date`, `Time`, HallId, `Row`, Place, FilmId, PriceId)
+VALUES
+('2022-05-05', '10:00:00', 1, 1, 1, 1, 2),
+('2022-05-05', '10:00:00', 1, 1, 2, 1, 2),
+('2022-05-05', '10:00:00', 1, 1, 3, 1, 2),
+('2022-05-05', '10:00:00', 1, 1, 4, 1, 3),
+('2022-05-05', '10:00:00', 1, 1, 5, 1, 3),
+('2022-05-05', '10:00:00', 1, 2, 1, 1, 2),
+('2022-05-05', '10:00:00', 1, 2, 2, 1, 2),
+('2022-05-05', '10:00:00', 1, 2, 3, 1, 2),
+('2022-05-05', '10:00:00', 1, 2, 4, 1, 2),
+('2022-05-05', '10:00:00', 1, 2, 5, 1, 2),
+('2022-05-05', '10:00:00', 1, 3, 1, 1, 1),
+('2022-05-05', '10:00:00', 1, 3, 2, 2, 1),
+('2022-05-05', '10:00:00', 1, 3, 3, 2, 1),
+('2022-05-05', '10:00:00', 1, 3, 4, 3, 2),
+('2022-05-05', '10:00:00', 1, 3, 5, 3, 2),
+('2022-05-05', '12:00:00', 1, 4, 1, 1, 5),
+('2022-05-05', '12:00:00', 1, 4, 2, 1, 5),
+('2022-05-05', '12:00:00', 1, 4, 3, 1, 4),
+('2022-05-05', '12:00:00', 1, 4, 4, 1, 4),
+('2022-05-05', '12:00:00', 1, 4, 5, 1, 4),
+('2022-05-05', '12:00:00', 2, 1, 1, 2, 6),
+('2022-05-05', '12:00:00', 2, 1, 2, 2, 6),
+('2022-05-05', '12:00:00', 2, 1, 3, 2, 6),
+('2022-05-05', '12:00:00', 2, 1, 4, 2, 6),
+('2022-05-05', '12:00:00', 2, 1, 5, 2, 6),
+('2022-05-05', '14:00:00', 1, 1, 1, 1, 7),
+('2022-05-05', '14:00:00', 1, 1, 2, 1, 7),
+('2022-05-05', '14:00:00', 1, 1, 3, 1, 7),
+('2022-05-05', '14:00:00', 1, 1, 4, 1, 7),
+('2022-05-05', '14:00:00', 1, 1, 5, 1, 7),
+('2022-05-05', '14:00:00', 1, 2, 1, 1, 8),
+('2022-05-05', '14:00:00', 1, 2, 2, 1, 8),
+('2022-05-05', '14:00:00', 1, 2, 3, 1, 8),
+('2022-05-05', '14:00:00', 1, 2, 4, 1, 9),
+('2022-05-05', '14:00:00', 1, 2, 5, 1, 9),
+('2022-05-05', '17:00:00', 1, 3, 1, 1, 10),
+('2022-05-05', '17:00:00', 1, 3, 2, 2, 11),
+('2022-05-05', '17:00:00', 1, 3, 3, 2, 11),
+('2022-05-05', '17:00:00', 1, 3, 4, 3, 11),
+('2022-05-05', '17:00:00', 1, 3, 5, 3, 11),
+('2022-05-05', '18:00:00', 1, 4, 1, 1, 15),
+('2022-05-05', '18:00:00', 1, 4, 2, 1, 15),
+('2022-05-05', '18:00:00', 1, 4, 3, 1, 15),
+('2022-05-05', '18:00:00', 1, 4, 4, 1, 13),
+('2022-05-05', '18:00:00', 1, 4, 5, 1, 14),
+('2022-05-05', '20:00:00', 2, 1, 1, 2, 16),
+('2022-05-05', '20:00:00', 2, 1, 2, 2, 16),
+('2022-05-05', '20:00:00', 2, 1, 3, 2, 16),
+('2022-05-05', '20:00:00', 2, 1, 4, 2, 16),
+('2022-05-05', '20:00:00', 2, 1, 5, 2, 17),
+('2022-05-05', '20:00:00', 2, 1, 1, 2, 17),
+('2022-05-05', '20:00:00', 2, 1, 2, 2, 17),
+('2022-05-05', '20:00:00', 2, 1, 3, 2, 17),
+('2022-05-05', '20:00:00', 2, 1, 4, 2, 18),
+('2022-05-05', '20:00:00', 2, 1, 5, 2, 18),
+('2022-05-06', '10:00:00', 1, 1, 1, 1, 19),
+('2022-05-06', '10:00:00', 1, 1, 2, 1, 19),
+('2022-05-06', '10:00:00', 1, 1, 3, 1, 20),
+('2022-05-06', '10:00:00', 1, 1, 4, 1, 20),
+('2022-05-06', '10:00:00', 1, 1, 5, 1, 21),
+('2022-05-06', '10:00:00', 1, 2, 1, 1, 21),
+('2022-05-06', '10:00:00', 1, 2, 2, 1, 21),
+('2022-05-06', '10:00:00', 1, 2, 3, 1, 21),
+('2022-05-06', '10:00:00', 1, 2, 4, 1, 21),
+('2022-05-06', '10:00:00', 1, 2, 5, 1, 21),
+('2022-05-06', '10:00:00', 1, 3, 1, 1, 21),
+('2022-05-06', '10:00:00', 1, 3, 2, 2, 21),
+('2022-05-06', '10:00:00', 1, 3, 3, 2, 21),
+('2022-05-06', '10:00:00', 1, 3, 4, 3, 20),
+('2022-05-06', '10:00:00', 1, 3, 5, 3, 20),
+('2022-05-06', '12:00:00', 1, 4, 1, 1, 22),
+('2022-05-06', '12:00:00', 1, 4, 2, 1, 22),
+('2022-05-06', '12:00:00', 1, 4, 3, 1, 22),
+('2022-05-06', '12:00:00', 1, 4, 4, 1, 23),
+('2022-05-06', '12:00:00', 1, 4, 5, 1, 23),
+('2022-05-06', '12:00:00', 2, 1, 1, 2, 23),
+('2022-05-06', '12:00:00', 2, 1, 2, 2, 23),
+('2022-05-06', '12:00:00', 2, 1, 3, 2, 23),
+('2022-05-06', '12:00:00', 2, 1, 4, 2, 24),
+('2022-05-06', '12:00:00', 2, 1, 5, 2, 24),
+('2022-05-06', '14:00:00', 1, 1, 1, 1, 27),
+('2022-05-06', '14:00:00', 1, 1, 2, 1, 27),
+('2022-05-06', '14:00:00', 1, 1, 3, 1, 27),
+('2022-05-06', '14:00:00', 1, 1, 4, 1, 27),
+('2022-05-06', '14:00:00', 1, 1, 5, 1, 27),
+('2022-05-06', '14:00:00', 1, 2, 1, 1, 25),
+('2022-05-06', '14:00:00', 1, 2, 2, 1, 25),
+('2022-05-06', '14:00:00', 1, 2, 3, 1, 25),
+('2022-05-06', '14:00:00', 1, 2, 4, 1, 25),
+('2022-05-06', '14:00:00', 1, 2, 5, 1, 25),
+('2022-05-06', '17:00:00', 1, 3, 1, 1, 28),
+('2022-05-06', '17:00:00', 1, 3, 2, 2, 28),
+('2022-05-06', '17:00:00', 1, 3, 3, 2, 29),
+('2022-05-06', '17:00:00', 1, 3, 4, 3, 29),
+('2022-05-06', '17:00:00', 1, 3, 5, 3, 30),
+('2022-05-06', '18:00:00', 1, 4, 1, 1, 31),
+('2022-05-06', '18:00:00', 1, 4, 2, 1, 31),
+('2022-05-06', '18:00:00', 1, 4, 3, 1, 32),
+('2022-05-06', '18:00:00', 1, 4, 4, 1, 32),
+('2022-05-06', '18:00:00', 1, 4, 5, 1, 32),
+('2022-05-06', '20:00:00', 2, 1, 1, 2, 34),
+('2022-05-06', '20:00:00', 2, 1, 2, 2, 34),
+('2022-05-06', '20:00:00', 2, 1, 3, 2, 34),
+('2022-05-06', '20:00:00', 2, 1, 4, 2, 35),
+('2022-05-06', '20:00:00', 2, 1, 5, 2, 35),
+('2022-05-06', '20:00:00', 2, 1, 1, 2, 35),
+('2022-05-06', '20:00:00', 2, 1, 2, 2, 35),
+('2022-05-06', '20:00:00', 2, 1, 3, 2, 36),
+('2022-05-06', '20:00:00', 2, 1, 4, 2, 36),
+('2022-05-06', '20:00:00', 2, 1, 5, 2, 36)
+
+
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfo()
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, f.Name AS `Film Name`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Film f ON f.Id=b.FilmId
+JOIN Price p ON p.Id=b.PriceId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false;
+END //
+DELIMITER ;
+
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByName(IN filmName VARCHAR(100))
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByNameDate(IN filmName VARCHAR(100), IN ddate DATE)
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName
+AND b.Date=ddate;
+END //
+DELIMITER ;
+
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByNameTime(IN filmName VARCHAR(100), IN ttime TIME)
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName
+AND b.Time=ttime;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByNameHall(IN filmName VARCHAR(100), IN hall VARCHAR(40))
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName
+AND h.Name=hall;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByNameDateTime(IN filmName VARCHAR(100), IN ddate DATE, IN ttime TIME)
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName
+AND b.Date=ddate AND b.Time=ttime;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByNameDateTimeHall(IN filmName VARCHAR(100), IN ddate DATE, 
+IN ttime TIME, IN hallName VARCHAR(40))
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName
+AND b.Date=ddate AND b.Time=ttime 
+AND h.Name=hallName;
+END //
+DELIMITER ;
+
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByNameDateHall(IN filmName VARCHAR(100), 
+IN ddate DATE, IN hallName VARCHAR(40))
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName
+AND b.Date=ddate AND h.Name=hallName;
+END //
+DELIMITER ;
+
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByNameTimeHall(IN filmName VARCHAR(100), 
+IN ttime TIME, IN hallName VARCHAR(40))
+BEGIN
+SELECT b.Id, b.Date AS `Date`, b.Time AS `Time`, h.Name AS `Hall`, c.Name AS `Category`, 
+b.Row AS `Row`, b.Place AS `Place`, p.Cost AS `Price`
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND f.Name=filmName
+AND b.Time=ttime AND h.Name=hallName;
+END //
+DELIMITER ;
+
+
+
+DELIMITER //
+CREATE PROCEDURE sp_BookingInfoByWeekdayTime(IN dayIndex INT, IN ttime1 TIME, IN ttime2 TIME)
+BEGIN
+SELECT DISTINCT b.Date AS `Date`, b.Time AS `Time`, f.Name
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false AND WEEKDAY(b.Date)=dayIndex
+AND b.Time >= ttime1 AND b.Time <= ttime2;
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE PROCEDURE sp_PricesByRequirements(IN filmName VARCHAR(100))
+BEGIN
+SELECT b.Date, b.Time, h.Name AS Hall, c.Name AS Category, b.Row, b.Place, p.Cost AS Price
+FROM Booking b
+JOIN Price p ON p.Id=b.PriceId
+JOIN Film f ON f.Id=b.FilmId
+JOIN Category c ON c.Id=p.CategoryId
+JOIN Hall h ON h.Id=b.HallId
+WHERE b.isSold=false
+AND f.Name=filmName
+ORDER BY Price ASC;
+END //
+DELIMITER ;
+
+
+
+
+DELIMITER //
+CREATE PROCEDURE sp_TicketByIdCustomer(IN id INT, IN customer VARCHAR(40))
+BEGIN
+SELECT t.Id, c.Name, h.Name, b.Row, b.Place, t.Date, t.Time, f.Name 
+FROM Ticket t 
+JOIN Booking b ON b.Id = t.BookingId
+JOIN Film f ON f.Id=b.FilmId 
+JOIN Price p ON b.PriceId=p.Id
+JOIN Category c ON c.Id=p.CategoryId 
+JOIN Hall h ON h.Id=b.HallId=h.Id 
+WHERE t.bookingId=id AND t.Customer=customer;
+END //
+DELIMITER ;
+
+
+
 
